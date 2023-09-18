@@ -52,6 +52,7 @@ export const TextArea = ({ value, onChange }) => {
           fontSize='sm'
           fontWeight='bold'
           onChange={handleChange}
+          value={value}
         />
       </Flex>
     </Flex>

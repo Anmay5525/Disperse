@@ -8,6 +8,7 @@ export const Disperse = () => {
   const [errors, setErrors] = useState([]);
   const [hasDuplicateEntries, setHasDuplicateEntries] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+
   const hashMapRef = useRef();
 
   const resetErrorStates = () => {
@@ -95,6 +96,7 @@ export const Disperse = () => {
       setIsSuccess(true);
     }
   };
+
   return (
     <div>
       <form onSubmit={handleSubmit}>

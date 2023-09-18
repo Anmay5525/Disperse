@@ -1,13 +1,22 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { Box, Flex, Textarea } from '@chakra-ui/react';
 
+const textAreaHeight = 200;
+
 export const TextArea = ({ value, onChange }) => {
-  const textAreaHeight = 200;
+  const lineCounterRef = useRef();
+  const textareaRef = useRef();
 
   const lineCount = useMemo(() => value.split('\n').length, [value]);
 
   const handleChange = (e) => {
     onChange(e);
+  };
+
+  const handleTextAreaScroll = () => {
+    if (lineCounterRef.current && textareaRef.current) {
+      lineCounterRef.current.scrollTop = textareaRef.current.scrollTop;
+    }
   };
 
   return (
@@ -21,6 +30,15 @@ export const TextArea = ({ value, onChange }) => {
         width='30px'
         lineHeight='base'
         fontSize='sm'
+        ref={lineCounterRef}
+        css={{
+          '&::-webkit-scrollbar': {
+            width: '0px',
+          },
+          '&::-webkit-scrollbar-track': {
+            width: '0px',
+          },
+        }}
       >
         {Array.from({ length: lineCount }, (_, i) => i + 1).map((item, idx) => (
           <Box key={idx} textAlign='right' fontWeight='bold' color='gray.500'>
@@ -53,6 +71,8 @@ export const TextArea = ({ value, onChange }) => {
           fontWeight='bold'
           onChange={handleChange}
           value={value}
+          onScroll={handleTextAreaScroll}
+          ref={textareaRef}
         />
       </Flex>
     </Flex>

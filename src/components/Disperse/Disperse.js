@@ -125,7 +125,7 @@ export const Disperse = () => {
           </Flex>
         ) : null}
         {errors.length ? (
-          <Alert marginTop='5'>
+          <Alert marginTop='5' variant='error'>
             <Flex flexDirection='column'>
               {errors.map((error, idx) => (
                 <div key={`${error}-${idx}`}>{error}</div>
@@ -133,7 +133,11 @@ export const Disperse = () => {
             </Flex>
           </Alert>
         ) : null}
-        {isSuccess ? <Text color='green.300'>Success!</Text> : null}
+        {isSuccess ? (
+          <Alert marginTop='5' variant='success'>
+            <Text>Success!</Text>
+          </Alert>
+        ) : null}
         <Flex justifyContent='center' marginTop='10'>
           <Button
             type='submit'

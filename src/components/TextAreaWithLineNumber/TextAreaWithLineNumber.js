@@ -3,8 +3,8 @@ import { Box, Flex, Textarea } from '@chakra-ui/react';
 
 const textAreaHeight = 200;
 
-export const TextArea = ({ value, onChange }) => {
-  const lineCounterRef = useRef();
+export const TextAreaWithLineNumber = ({ value, onChange, name }) => {
+  const lineNumberRef = useRef();
   const textareaRef = useRef();
 
   const lineCount = useMemo(() => value.split('\n').length, [value]);
@@ -14,8 +14,8 @@ export const TextArea = ({ value, onChange }) => {
   };
 
   const handleTextAreaScroll = () => {
-    if (lineCounterRef.current && textareaRef.current) {
-      lineCounterRef.current.scrollTop = textareaRef.current.scrollTop;
+    if (lineNumberRef.current && textareaRef.current) {
+      lineNumberRef.current.scrollTop = textareaRef.current.scrollTop;
     }
   };
 
@@ -30,7 +30,7 @@ export const TextArea = ({ value, onChange }) => {
         width='30px'
         lineHeight='base'
         fontSize='sm'
-        ref={lineCounterRef}
+        ref={lineNumberRef}
         css={{
           '&::-webkit-scrollbar': {
             width: '0px',
@@ -40,11 +40,13 @@ export const TextArea = ({ value, onChange }) => {
           },
         }}
       >
-        {Array.from({ length: lineCount }, (_, i) => i + 1).map((item, idx) => (
-          <Box key={idx} textAlign='right' fontWeight='bold' color='gray.500'>
-            {item}
-          </Box>
-        ))}
+        {Array.from({ length: lineCount }, (_number, i) => i + 1).map(
+          (item, idx) => (
+            <Box key={idx} textAlign='right' fontWeight='bold' color='gray.500'>
+              {item}
+            </Box>
+          )
+        )}
       </Flex>
 
       <Box
@@ -59,13 +61,14 @@ export const TextArea = ({ value, onChange }) => {
 
       <Flex paddingLeft='3' paddingTop='2'>
         <Textarea
+          name={name || 'textarea'}
           padding='0'
           border='none'
           outline='none'
           _focusVisible={{ border: 'none' }}
           resize='none'
           height={textAreaHeight}
-          width='2xl'
+          width='50vw'
           lineHeight='base'
           fontSize='sm'
           fontWeight='bold'

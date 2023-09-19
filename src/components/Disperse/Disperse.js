@@ -1,7 +1,10 @@
 import { Box, Button, Flex, Text } from '@chakra-ui/react';
 import React, { useRef, useState } from 'react';
 import { Alert } from '../Alert/Alert';
-import { TextArea } from '../TextArea/TextArea';
+import { TextAreaWithLineNumber } from '../TextAreaWithLineNumber/TextAreaWithLineNumber';
+import { DuplicateEntries } from './DuplicateEntries';
+import { FormErrors } from './FormErrors';
+import { getValidationErrors } from './utils';
 
 export const Disperse = () => {
   const [textAreaValue, setTextAreaValue] = useState('');
@@ -42,54 +45,24 @@ export const Disperse = () => {
     resetErrorStates();
   };
 
-  const handleSubmit = (e) => {
+  const onFindingDuplicate = () => {
+    setHasDuplicateEntries(true);
+  };
+
+  const onSubmit = (e) => {
     e.preventDefault();
     setErrors([]);
     setHasDuplicateEntries(false);
-
-    const submissionErrors = [];
 
     const inputLines = textAreaValue.split('\n');
     const hashMap = new Map();
     hashMapRef.current = hashMap;
 
-    inputLines.forEach((line, idx) => {
-      let result = line.trim().split(/,| |=/i);
-      result = result.filter((val) => !!val);
-
-      const address = result[0];
-      const amount = result[1];
-
-      if (result.length !== 2) {
-        submissionErrors.push(
-          `Error in line ${idx + 1}. Only 2 values are expected`
-        );
-      }
-      if (isNaN(Number(amount))) {
-        submissionErrors.push(`Line ${idx + 1} wrong amount`);
-      }
-
-      if (hashMap.has(address)) {
-        hashMap.set(address, {
-          lineIds: [...hashMap.get(address).lineIds, idx + 1],
-          amounts: [...hashMap.get(address).amounts, amount],
-        });
-      } else {
-        hashMap.set(address, { lineIds: [idx + 1], amounts: [amount] });
-      }
-    });
-
-    for (const [key, value] of hashMap) {
-      if (value.lineIds.length > 1) {
-        setHasDuplicateEntries(true);
-        submissionErrors.push(
-          `Address ${key} encountered duplicate in Line: ${value.lineIds.join(
-            ','
-          )}`
-        );
-      }
-    }
-
+    const submissionErrors = getValidationErrors(
+      inputLines,
+      hashMap,
+      onFindingDuplicate
+    );
     setErrors(submissionErrors);
 
     if (!submissionErrors.length) {
@@ -98,43 +71,29 @@ export const Disperse = () => {
   };
 
   return (
-    <div>
-      <form onSubmit={handleSubmit}>
-        <span>Addresses with amounts</span>
-        <TextArea
+    <Box>
+      <form onSubmit={onSubmit}>
+        <Text color='gray.600' fontWeight='semibold' marginBottom='2'>
+          Addresses with amounts
+        </Text>
+        <TextAreaWithLineNumber
           value={textAreaValue}
           onChange={(e) => {
             setTextAreaValue(e.target.value);
             resetErrorStates();
           }}
+          name='user-input'
         />
-
-        <span>Separated by ',' or ' ' or '='</span>
+        <Text color='gray.600' fontWeight='semibold'>
+          Separated by ',' or ' ' or '='
+        </Text>
         {hasDuplicateEntries ? (
-          <Flex justifyContent='space-between' color='red.400' marginTop='5'>
-            <Box as='span' fontWeight='bold'>
-              Duplicated
-            </Box>
-            <Flex gap='3'>
-              <Button variant='link' color='red.400' onClick={keepFirstEntry}>
-                Keep the first one
-              </Button>
-              <Text>|</Text>
-              <Button variant='link' color='red.400' onClick={combineBalance}>
-                Combine Balance
-              </Button>
-            </Flex>
-          </Flex>
+          <DuplicateEntries
+            keepFirstEntry={keepFirstEntry}
+            combineBalance={combineBalance}
+          />
         ) : null}
-        {errors.length ? (
-          <Alert marginTop='5' variant='error'>
-            <Flex flexDirection='column'>
-              {errors.map((error, idx) => (
-                <div key={`${error}-${idx}`}>{error}</div>
-              ))}
-            </Flex>
-          </Alert>
-        ) : null}
+        {errors.length ? <FormErrors errors={errors} /> : null}
         {isSuccess ? (
           <Alert marginTop='5' variant='success'>
             <Text>Success!</Text>
@@ -152,6 +111,6 @@ export const Disperse = () => {
           </Button>
         </Flex>
       </form>
-    </div>
+    </Box>
   );
 };

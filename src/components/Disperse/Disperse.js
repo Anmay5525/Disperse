@@ -103,9 +103,9 @@ export const Disperse = () => {
           <Button
             type='submit'
             width='100%'
-            bgColor='blue.400'
+            bgColor='blue.600'
             color='white'
-            _hover={{ backgroundColor: 'blue.300' }}
+            _hover={{ backgroundColor: 'blue.500' }}
           >
             Next
           </Button>
